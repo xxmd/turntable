@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="Turntable">
+        <attr name="borderColor" format="color"/>
+        <attr name="labelColor" format="color"/>
+        <attr name="centerIndicator" format="reference"/>
+        <attr name="indicatorPointAngle" format="float"/>
+        <attr name="labelTextSize" format="dimension"/>
+        <attr name="labelMarginCenter" format="dimension"/>
+    </declare-styleable>
+</resources>

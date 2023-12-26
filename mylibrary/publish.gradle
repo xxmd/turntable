@@ -1,0 +1,60 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+// 源代码打包任务
+task sourcesJar(type: Jar) {
+    archiveClassifier.set("sources")
+    from android.sourceSets.getByName("main").java.srcDirs
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId = publishedGroupId
+                artifactId = artifact
+                version = libraryVersion
+                from components.release
+                artifact sourcesJar
+                pom {
+                    name = artifact
+                    description = libraryDescription
+                    url = siteUrl
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:git://github.com/xxmd.git'
+                        developerConnection = 'scm:git:ssh://github.com/xxmd.git'
+                        url = 'https://github.com/xxmd'
+                    }
+                    developers {
+                        developer {
+                            id = 'xxmd'
+                            name = 'xxmd'
+                            email = 'xxmd3720@gmail.com'
+                        }
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                name = "sonatype"
+                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+
+                credentials {
+                    username ossrhUsername
+                    password ossrhPassword
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications
+}
