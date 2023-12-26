@@ -53,6 +53,7 @@ public class Turntable extends View {
     private TypedArray typedArray;
     private Drawable centerIndicator;
     private float labelMarinCenter;
+    private int rotateDuration;
 
     public TurntableListener getListener() {
         return listener;
@@ -107,6 +108,8 @@ public class Turntable extends View {
         labelPaint.setTextSize(labelTextSize);
 
         labelMarinCenter = typedArray.getFloat(R.styleable.Turntable_labelMarginCenter, 0.75f);
+
+        rotateDuration = typedArray.getInt(R.styleable.Turntable_rotateDuration, 2 * 1000);
     }
 
     private void initPaint() {
@@ -158,13 +161,15 @@ public class Turntable extends View {
 
 
     public void rotate() {
-        int duration = 1 * 1000;
+        // prevent multiply click in short time
+        stopRotate();
+
         long period = 1000 / 30;
-//        int totalAngle = ThreadLocalRandom.current().nextInt(270, 360 + 1) * 5;
-        int totalAngle = 60;
+        int totalAngle = ThreadLocalRandom.current().nextInt(270, 360 + 1) * 5;
         AccelerateDecelerateInterpolator interpolator = new AccelerateDecelerateInterpolator();
+
         interval = Observable.interval(period, TimeUnit.MILLISECONDS)
-                .takeUntil(times -> times * period >= duration)
+                .takeUntil(times -> times * period >= rotateDuration)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> {
@@ -173,7 +178,7 @@ public class Turntable extends View {
                     }
                 })
                 .subscribe(times -> {
-                    float input = times * period * 1.0f / duration;
+                    float input = times * period * 1.0f / rotateDuration;
                     float interpolation = interpolator.getInterpolation(input);
                     addedAngle = interpolation * totalAngle;
                     invalidate();

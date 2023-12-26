@@ -7,5 +7,6 @@
         <attr name="indicatorPointAngle" format="float"/>
         <attr name="labelTextSize" format="dimension"/>
         <attr name="labelMarginCenter" format="dimension"/>
+        <attr name="rotateDuration" format="integer"/>
     </declare-styleable>
 </resources>
