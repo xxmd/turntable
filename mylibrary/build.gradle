@@ -53,7 +53,7 @@ ext {
     publishedGroupId = 'io.github.xxmd'
     artifact = rootProject.name
     libraryVersion = '1.0.0'
-    libraryDescription = ''
+    libraryDescription = 'truntable view'
     siteUrl = 'https://github.com/xxmd/' + rootProject.name
 }
 
