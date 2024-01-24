@@ -18,9 +18,7 @@
    <io.github.xxmd.Turntable
            android:id="@+id/turn_table"
            android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           app:indicatorPointAngle="-45"
-           app:labelTextSize="12sp" />
+           android:layout_height="wrap_content" />
    ```
 
 ## Usage
@@ -33,11 +31,11 @@
         <enum name="Horizon" value="0"/>
         <enum name="CenterOut" value="1"/>
     </attr>
+    <attr name="labelMarginPercent" format="float"/>
     <attr name="labelColor" format="color"/>
+    <attr name="labelTextSize" format="dimension"/>
     <attr name="centerIndicator" format="reference"/>
     <attr name="indicatorPointAngle" format="float"/>
-    <attr name="labelTextSize" format="dimension"/>
-    <attr name="labelMarginPercent" format="float"/>
     <attr name="rotateDuration" format="integer"/>
 </declare-styleable>
 ```
