@@ -2,11 +2,16 @@
 <resources>
     <declare-styleable name="Turntable">
         <attr name="borderColor" format="color"/>
+        <attr name="borderPercent" format="float"/>
+        <attr name="labelDirection" format="enum">
+            <enum name="Horizon" value="0"/>
+            <enum name="CenterOut" value="1"/>
+        </attr>
+        <attr name="labelMarginPercent" format="float"/>
         <attr name="labelColor" format="color"/>
+        <attr name="labelTextSize" format="dimension"/>
         <attr name="centerIndicator" format="reference"/>
         <attr name="indicatorPointAngle" format="float"/>
-        <attr name="labelTextSize" format="dimension"/>
-        <attr name="labelMarginCenter" format="dimension"/>
         <attr name="rotateDuration" format="integer"/>
     </declare-styleable>
 </resources>

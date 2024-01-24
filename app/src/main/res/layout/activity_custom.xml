@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <ImageView
+        android:id="@+id/bgStroke"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/dot_stroke"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <io.github.xxmd.Turntable
+        android:layout_margin="40dp"
+        android:id="@+id/turn_table"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:centerIndicator="@mipmap/yellow_dot"
+        app:indicatorPointAngle="-90"
+        app:labelDirection="CenterOut"
+        app:labelTextSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/bgStroke"
+        app:layout_constraintEnd_toEndOf="@id/bgStroke"
+        app:layout_constraintStart_toStartOf="@id/bgStroke"
+        app:layout_constraintTop_toTopOf="@id/bgStroke" />
+
+    <ImageView
+        android:id="@+id/ivPoint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/orange_indicator"
+        app:layout_constraintEnd_toEndOf="@id/bgStroke"
+        app:layout_constraintStart_toStartOf="@id/bgStroke"
+        app:layout_constraintTop_toTopOf="@id/bgStroke"/>
+
+
+    <TextView
+        android:id="@+id/tvTips"
+        app:layout_constraintTop_toBottomOf="@id/bgStroke"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:lineHeight="30dp"
+        android:text="1. Run trigger: click turntable\n2. Point angle: -45°"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btnSkip"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="To PlainActivity"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

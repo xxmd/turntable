@@ -1,25 +1,26 @@
 package io.github.xxmd;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import io.github.xxmd.databinding.ActivityMainBinding;
+import io.github.xxmd.databinding.ActivityPlainBinding;
 
 
-public class MainActivity extends AppCompatActivity {
-    private ActivityMainBinding binding;
+public class PlainActivity extends AppCompatActivity {
+    private ActivityPlainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        binding = ActivityPlainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         initView();
         bindEvent();
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void bindEvent() {
         binding.turnTable.setOnClickListener(v -> binding.turnTable.rotate());
+
         binding.turnTable.setListener(new TurntableListener() {
             @Override
             public void onRotateStart(float preRotateAngle) {
@@ -34,16 +36,18 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onRotating(float rotateAngle) {
+            public void onRotating(float rotateAngle, float slope) {
 
             }
 
             @Override
             public void onRotateEnd(float hasRotateAngle) {
                 TableOption result = binding.turnTable.getResult();
-                Toast.makeText(MainActivity.this, result.label, Toast.LENGTH_SHORT).show();
+                Toast.makeText(PlainActivity.this, result.label, Toast.LENGTH_SHORT).show();
             }
         });
+
+        binding.btnBack.setOnClickListener(v -> finish());
     }
 
     private void initView() {

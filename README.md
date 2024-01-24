@@ -1,29 +1,55 @@
-# Introduction
+## Screenshot
 
-An android scaffold project for publish android library to maven center on enviroment of Gradle 6.7.1 and Gradle plugin 4.2.2 .
+|                            Simple                            |                           Complex                            |
+| :----------------------------------------------------------: | :----------------------------------------------------------: |
+| ![](https://wms-file-bucket.oss-cn-hangzhou.aliyuncs.com/1%E6%9C%8824%E6%97%A5%281%29.gif) | ![](https://wms-file-bucket.oss-cn-hangzhou.aliyuncs.com/1%E6%9C%8824%E6%97%A5.gif) |
 
+## Getting started
 
-## Difference when publish android library in different Gradle version 
+1. Import library
 
-In 2023 years, publishing an android library is very simple. However, it only established when you use environment of Gradle above 7.0 and Gradle plugin above 7.0. When you use old version, such as Gradle 6.7.1 and Gradle plugin 4.2.2, the situation is totally different.
+   ```xml
+   implementation 'io.github.xxmd:turntable:1.0.2'
+   ```
 
+2. Using in layout
 
-Main different points is list there:
+   ```xml
+   <io.github.xxmd.Turntable
+           android:id="@+id/turn_table"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           app:indicatorPointAngle="-45"
+           app:labelTextSize="12sp" />
+   ```
 
-1. The `setting.gradle` file play different role in Gradle version above 7.0 and below 7.0.
+## Usage
 
-   - Gradle version > 7.0, `setting.gradle` file will include some modules and manage dependency repository.  
+```xml
+<declare-styleable name="Turntable">
+    <attr name="borderColor" format="color"/>
+    <attr name="borderPercent" format="float"/>
+    <attr name="labelDirection" format="enum">
+        <enum name="Horizon" value="0"/>
+        <enum name="CenterOut" value="1"/>
+    </attr>
+    <attr name="labelColor" format="color"/>
+    <attr name="centerIndicator" format="reference"/>
+    <attr name="indicatorPointAngle" format="float"/>
+    <attr name="labelTextSize" format="dimension"/>
+    <attr name="labelMarginPercent" format="float"/>
+    <attr name="rotateDuration" format="integer"/>
+</declare-styleable>
+```
 
-   - Gradle version < 7.0, `setting.gradle` file only include modules, the dependency repository script will be written in `build.gradle` file.
-
-2. Build artifact generate
-
-   - Gradle version > 7.0, publish will auto generator build artifact, you only need to include the release artifact. It will include source code, doc file, resource file, etc.
-
-   - Gradle version < 7.0, you need to generate build artifact by write task manually, then include the task in script.
-
-
-## Reference
-
-Publish configuration mostly reference from [android-gpuimage](https://github.com/cats-oss/android-gpuimage) project. It is a excellent project, It's source  `build.gradle` file location is [there](https://github.com/cats-oss/android-gpuimage/blob/master/library/build.gradle).
-If you want to publish library on old Gradle and Gradle plugin version, you could refer this project carefully.
+| Name                | Format    | Description                                                  |
+| ------------------- | --------- | ------------------------------------------------------------ |
+| borderColor         | color     | Outside border or stroke color                               |
+| borderPercent       | float     | The percentage of the border of radius                       |
+| labelDirection      | enum      | 1. Horizon: perpendicular to radius<br />2. CenterOut: along the radius from the center to the border |
+| labelMarginPercent  | float     | The percentage of the distance from the text to the center of the circle to the radius |
+| labelColor          | color     | Text label color                                             |
+| labelTextSize       | color     | Label text size                                              |
+| centerIndicator     | reference | Image of center indicator                                    |
+| indicatorPointAngle | float     | The virtual indicator point angle                            |
+| rotateDuration      | integer   | Duration of once rotate (Unit: ms)                           |

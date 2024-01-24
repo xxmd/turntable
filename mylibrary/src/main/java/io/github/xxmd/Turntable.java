@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -52,8 +53,11 @@ public class Turntable extends View {
     private float indicatorPointAngle = -45;
     private TypedArray typedArray;
     private Drawable centerIndicator;
-    private float labelMarinCenter;
+    private float labelMarginPercent;
     private int rotateDuration;
+
+    public static final int DIRECTION_HORIZON = 0;
+    public static final int DIRECTION_CENTER_OUT = 1;
 
     public TurntableListener getListener() {
         return listener;
@@ -107,7 +111,7 @@ public class Turntable extends View {
         float labelTextSize = typedArray.getDimension(R.styleable.Turntable_labelTextSize, 28f);
         labelPaint.setTextSize(labelTextSize);
 
-        labelMarinCenter = typedArray.getFloat(R.styleable.Turntable_labelMarginCenter, 0.75f);
+        labelMarginPercent = typedArray.getFloat(R.styleable.Turntable_labelMarginPercent, 0.75f);
 
         rotateDuration = typedArray.getInt(R.styleable.Turntable_rotateDuration, 2 * 1000);
     }
@@ -138,9 +142,17 @@ public class Turntable extends View {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int width = MeasureSpec.makeMeasureSpec(widthMeasureSpec, MeasureSpec.getMode(widthMeasureSpec));
         int height = MeasureSpec.makeMeasureSpec(heightMeasureSpec, MeasureSpec.getMode(heightMeasureSpec));
+        // warp_count will cause negative value
+        if (width < 0) {
+            width = Integer.MAX_VALUE;
+        }
+        if (height < 0) {
+            height = Integer.MAX_VALUE;
+        }
         int size = Math.min(width, height);
         setMeasuredDimension(size, size);
     }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -148,24 +160,48 @@ public class Turntable extends View {
         if (tableOptionList == null || tableOptionList.size() == 0) {
             return;
         }
-        drawStroke(canvas);
-        canvas.scale(0.95f, 0.95f, canvas.getWidth() / 2, canvas.getHeight() / 2);
+        drawBorder(canvas);
         drawSectors(canvas);
         drawCenterDot(canvas);
         drawIndicator(canvas);
     }
 
-    private void drawStroke(Canvas canvas) {
+    private void drawBorder(Canvas canvas) {
+        float scale = 1;
+        int radius = canvas.getWidth() / 2;
+        if (typedArray != null) {
+            float borderPercent = typedArray.getFloat(R.styleable.Turntable_borderPercent, 0);
+            if (borderPercent < 0 || borderPercent > 1) {
+                throw new IllegalArgumentException(String.format("your borderPercent is %f, the valid range is [0, 1]", borderPercent));
+            }
+            scale -= borderPercent;
+        }
         canvas.drawCircle(canvas.getWidth() / 2, canvas.getHeight() / 2, canvas.getWidth() / 2, borderPaint);
+        canvas.scale(scale, scale, radius, canvas.getHeight() / 2);
     }
 
+    public float getMaxSlope() {
+        return computeSlope(0.5f);
+    }
+
+    private float computeSlope(float input) {
+        AccelerateDecelerateInterpolator interpolator = new AccelerateDecelerateInterpolator();
+        float pre = input - input * 0.01f;
+        float next = input + input * 0.01f;
+        if (pre < 0 || next > 1) {
+            return 0;
+        }
+        float preValue = interpolator.getInterpolation(pre);
+        float nextValue = interpolator.getInterpolation(next);
+        return (nextValue - preValue) / (next - pre);
+    }
 
     public void rotate() {
         // prevent multiply click in short time
         stopRotate();
 
         long period = 1000 / 30;
-        int totalAngle = ThreadLocalRandom.current().nextInt(270, 360 + 1) * 5;
+        int totalAngle = 360 * 5 + ThreadLocalRandom.current().nextInt(0, 360 + 1);
         AccelerateDecelerateInterpolator interpolator = new AccelerateDecelerateInterpolator();
 
         interval = Observable.interval(period, TimeUnit.MILLISECONDS)
@@ -181,8 +217,16 @@ public class Turntable extends View {
                     float input = times * period * 1.0f / rotateDuration;
                     float interpolation = interpolator.getInterpolation(input);
                     addedAngle = interpolation * totalAngle;
+                    if (times == 0) {
+                        return;
+                    }
+                    float slope = computeSlope(input);
+                    if (listener != null) {
+                        listener.onRotating(addedAngle, slope);
+                    }
                     invalidate();
-                }, throwable -> {}, () -> {
+                }, throwable -> {
+                }, () -> {
                     Handler handler = new Handler();
                     handler.post(() -> {
                         preRotateAngle = (preRotateAngle + addedAngle) % 360;
@@ -286,13 +330,35 @@ public class Turntable extends View {
         canvas.drawArc(rectF, -sweepAngle / 2, sweepAngle, true, sectorBgPaint);
 
         // draw label
-        canvas.translate(canvas.getWidth() / 2, canvas.getHeight() / 2);
-        canvas.rotate(90);
-        labelPaint.setColor(tableOption.labelColor);
-        canvas.drawText(tableOption.label, 0, -canvas.getHeight() / 2 * labelMarinCenter, labelPaint);
+        drawLabel(canvas, tableOption);
 
         canvas.restore();
         return sweepAngle;
+    }
+
+    private void drawLabel(Canvas canvas, TableOption tableOption) {
+        int direction = getLabelDirection();
+        canvas.translate(canvas.getWidth() / 2, canvas.getHeight() / 2);
+        labelPaint.setColor(tableOption.labelColor);
+        Rect rect = new Rect();
+        labelPaint.getTextBounds(tableOption.label, 0, tableOption.label.length(), rect);
+        switch (direction) {
+            case DIRECTION_HORIZON:
+                canvas.rotate(90);
+                canvas.drawText(tableOption.label, 0, -canvas.getHeight() / 2 * labelMarginPercent, labelPaint);
+                break;
+            case DIRECTION_CENTER_OUT:
+                canvas.drawText(tableOption.label, canvas.getWidth() / 2 * labelMarginPercent, 0, labelPaint);
+                break;
+        }
+    }
+
+    private int getLabelDirection() {
+        if (typedArray != null) {
+            int direction = typedArray.getInt(R.styleable.Turntable_labelDirection, DIRECTION_HORIZON);
+            return direction;
+        }
+        return DIRECTION_HORIZON;
     }
 
 }
